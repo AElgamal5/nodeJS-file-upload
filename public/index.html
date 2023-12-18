@@ -2,72 +2,112 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Node.js File Uploader</title>
+    <title>File Upload Form</title>
     <style>
       body {
-        font-family: Arial, Helvetica, sans-serif;
-        font-size: 1.5rem;
-        background-color: #333;
-        color: whitesmoke;
-      }
-
-      input,
-      button {
-        font: inherit;
-        width: max-content;
-      }
-
-      form {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
         display: flex;
-        flex-flow: column nowrap;
-        gap: 1.5rem;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      #upload-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      #file-input {
+        margin-bottom: 10px;
+      }
+
+      #submit-button {
+        background-color: #4caf50;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      #submit-button:hover {
+        background-color: #45a049;
+      }
+      hr {
+        border: 0;
+        height: 1px;
+        background-image: linear-gradient(
+          to right,
+          rgba(0, 0, 0, 0),
+          rgba(0, 0, 0, 0.75),
+          rgba(0, 0, 0, 0)
+        );
       }
     </style>
   </head>
-
   <body>
-    <h1>Node.js File Uploader</h1>
-    <form id="uploadForm">
-      <input type="file" id="myFiles" accept="image/*" multiple />
-      <button>Submit</button>
-    </form>
-    <h2></h2>
-    <h3></h3>
-    <script>
-      const form = document.getElementById("uploadForm");
-
-      const sendFiles = async () => {
-        // Object
-        const myFiles = document.getElementById("myFiles").files;
-
-        const formData = new FormData();
-
-        Object.keys(myFiles).forEach((key) => {
-          formData.append(myFiles.item(key).name, myFiles.item(key));
-        });
-
-        const response = await fetch("http://localhost:5000/v1/apis/cats", {
-          method: "POST",
-          body: formData,
-        });
-
-        const json = await response.json();
-
-        const h2 = document.querySelector("h2");
-        h2.textContent = `Status: ${json?.status}`;
-
-        const h3 = document.querySelector("h3");
-        h3.textContent = json?.msg;
-
-        console.log(json);
-      };
-
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        sendFiles();
-      });
-    </script>
+    <div id="upload-container">
+      <h1>File Upload Form</h1>
+      <form enctype="multipart/form-data" id="uploadForm">
+        <label for="file-input">Select a file:</label>
+        <br />
+        <input type="file" name="file" id="myFiles" required multiple />
+        <br />
+        <br />
+        <input type="submit" value="Upload File" id="submit-button" />
+      </form>
+      <h3></h3>
+      <ul id="list"></ul>
+    </div>
   </body>
+  <script>
+    const form = document.getElementById("uploadForm");
+
+    const sendFiles = async () => {
+      const myFiles = document.getElementById("myFiles").files;
+
+      const formData = new FormData();
+
+      Object.keys(myFiles).forEach((key) => {
+        formData.append(myFiles.item(key).name, myFiles.item(key));
+      });
+
+      const response = await fetch("http://localhost:3000/files", {
+        method: "POST",
+        body: formData,
+      });
+
+      const json = await response.json();
+
+      const h3 = document.querySelector("h3");
+      h3.textContent = json?.msg;
+
+      if (json?.fileNames) {
+        const ul = document.getElementById("list");
+        json.fileNames.forEach((fileName) => {
+          const li = document.createElement("li");
+
+          li.innerHTML = `<a href="http://localhost:3000/files/${fileName}" target="_blank">${fileName}</a>`;
+          ul.appendChild(li);
+        });
+        const hr = document.createElement("hr");
+        ul.appendChild(hr);
+      }
+
+      console.log(json);
+
+      form.reset();
+    };
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      sendFiles();
+    });
+  </script>
 </html>
