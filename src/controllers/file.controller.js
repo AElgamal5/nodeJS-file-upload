@@ -1,21 +1,26 @@
 const path = require("path");
-const Cat = require("../models/cat.model");
 
-const create = async (req, res) => {
+const save = async (req, res) => {
   const files = req.files;
 
-  let images = [];
+  //save the files names to save to DB or use it
+  let fileNames = [];
+
   let i = 0;
   Object.keys(files).forEach((key) => {
+    //get the file extension
     const ext = path.extname(files[key].name);
+    //Modify the file name to avoid repeated file name issues.
     files[key].name = `${+new Date()}_${i}${ext}`;
-    images.push(files[key].name);
+
+    fileNames.push(files[key].name);
+
     const filepath = path.join(
       __dirname,
       "..",
       "..",
       "storage",
-      "images",
+      "files",
       files[key].name
     );
     files[key].mv(filepath, (err) => {
@@ -25,9 +30,9 @@ const create = async (req, res) => {
   });
 
   return res.json({
-    status: "success",
-    msg: "Images uploaded successfully",
+    msg: "Files uploaded successfully",
+    fileNames,
   });
 };
 
-module.exports = { create };
+module.exports = { save };
