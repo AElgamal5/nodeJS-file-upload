@@ -4,16 +4,12 @@ const fs = require("fs");
 const save = async (req, res) => {
   try {
     const files = req.files;
-
-    //save the files names to save to DB or use it
     let fileNames = [];
 
     let i = 0;
     Object.keys(files).forEach((key) => {
-      //get the file extension
       const ext = path.extname(files[key].name);
 
-      //Modify the file name to avoid repeated file name issues.
       files[key].name = `${+new Date()}_${i}${ext}`;
 
       fileNames.push(files[key].name);
