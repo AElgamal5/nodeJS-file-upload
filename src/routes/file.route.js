@@ -17,9 +17,13 @@ router.post(
   "/",
   fileUpload({ createParentPath: true }),
   filePayloadExist,
-  fileExtLimiter([".png", ".jpg", ".jpeg"]),
+  fileExtLimiter,
   fileSizeLimiter,
   fileController.save
 );
+
+router.get("/:fileName", fileController.download);
+
+router.delete("/:fileName", fileController.remove);
 
 module.exports = router;

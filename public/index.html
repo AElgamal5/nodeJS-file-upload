@@ -67,6 +67,7 @@
     </div>
   </body>
   <script>
+    const baseUrl = "http://localhost:3000/files";
     const form = document.getElementById("uploadForm");
 
     const sendFiles = async () => {
@@ -78,30 +79,26 @@
         formData.append(myFiles.item(key).name, myFiles.item(key));
       });
 
-      const response = await fetch("http://localhost:3000/files", {
+      const response = await fetch(baseUrl, {
         method: "POST",
         body: formData,
       });
 
       const json = await response.json();
-
       const h3 = document.querySelector("h3");
-      h3.textContent = json?.msg;
 
+      h3.textContent = json?.msg;
       if (json?.fileNames) {
         const ul = document.getElementById("list");
         json.fileNames.forEach((fileName) => {
           const li = document.createElement("li");
 
-          li.innerHTML = `<a href="http://localhost:3000/files/${fileName}" target="_blank">${fileName}</a>`;
+          li.innerHTML = `<a href="${baseUrl}/${fileName}" target="_blank">${fileName}</a>`;
           ul.appendChild(li);
         });
         const hr = document.createElement("hr");
         ul.appendChild(hr);
       }
-
-      console.log(json);
-
       form.reset();
     };
 
